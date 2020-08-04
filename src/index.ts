@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { Compiler } from 'webpack';
-import recast from 'recast';
+import acorn from 'acorn';
 import { transformSync } from '@babel/core';
 
 interface IConvertES5Plugin {
@@ -19,15 +19,7 @@ class ConvertES5Plugin {
       // 读取文件内容，分析语法
       const code = fs.readFileSync(filePath, 'utf8');
       try {
-        recast.parse(code, {
-          parser: {
-            parse(code: string) {
-              return require('recast/parsers/acorn').parse(code, {
-                ecmaVersion: 5
-              });
-            }
-          }
-        });
+        acorn.parse(code, { ecmaVersion: 5 });
       } catch (err) {
         console.log('存在 ES6+ 的语法，正在转换...');
         transformFile = filePath;
@@ -40,11 +32,20 @@ class ConvertES5Plugin {
 
       // 使用 babel 将语法转换成
       const output = transformSync(code, {
-        presets: [['es2015', {
-          loose: true
-        }], ['@babel/preset-env', {
-          targets: '> 1%, last 2 versions, not ie <= 8'
-        }]],
+        presets: [
+          [
+            'es2015',
+            {
+              loose: true
+            }
+          ],
+          [
+            '@babel/preset-env',
+            {
+              targets: '> 1%, last 2 versions, not ie <= 8'
+            }
+          ]
+        ],
         plugins: []
       });
       fs.writeFileSync('./dist/es5-test.js', output?.code as string);
