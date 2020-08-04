@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { Compiler } from 'webpack';
 import recast from 'recast';
+import { transformSync } from '@babel/core';
 
 interface IConvertES5Plugin {
   path: string;
@@ -28,8 +29,8 @@ class ConvertES5Plugin {
           }
         });
       } catch (err) {
-        console.log('存在 ES5+ 的语法，正在转换...');
-        transformFile = code;
+        console.log('存在 ES6+ 的语法，正在转换...');
+        transformFile = filePath;
       }
 
       if (!transformFile) {
@@ -38,17 +39,16 @@ class ConvertES5Plugin {
       }
 
       // 使用 babel 将语法转换成
-      const ast = recast.parse(transformFile, {
-        parser: {
-          parse(transformFile: string) {
-            return require('recast/parsers/babylon').parse(transformFile, {
-              sourceType: 'script'
-            });
-          }
-        }
+      const output = transformSync(code, {
+        presets: [['es2015', {
+          loose: true
+        }], ['@babel/preset-env', {
+          targets: '> 1%, last 2 versions, not ie <= 8'
+        }]],
+        plugins: []
       });
-      const output = recast.print(ast).code;
-      fs.writeFileSync('./dist/es5-test.js', output);
+      fs.writeFileSync('./dist/es5-test.js', output?.code as string);
+      // fs.writeFileSync('.dist/es5-test.map', output.map);
       console.log('转换完成\n');
     });
   }
