@@ -7,7 +7,7 @@ interface IConvertES5Plugin {
 }
 
 class ConvertES5Plugin {
-  constructor(private readonly options: IConvertES5Plugin) {}
+  constructor(private readonly options: IConvertES5Plugin = {path: 'dist/vendors~main.js'}) {}
 
   apply(compiler: Compiler) {
     compiler.hooks.done.tap('ConvertES5Plugin', (compilation, callback) => {
@@ -31,13 +31,8 @@ class ConvertES5Plugin {
 
       // 使用 babel 将语法转换成
       const output = require('@babel/core').transformSync(code, {
+        filename: 'es5-test',
         presets: [
-          [
-            'es2015',
-            {
-              loose: true
-            }
-          ],
           [
             '@babel/preset-env',
             {
@@ -45,10 +40,22 @@ class ConvertES5Plugin {
             }
           ]
         ],
-        plugins: []
+        compact: false,
+        minified: true,
+        sourceMaps: true
       });
+      // const map = output?.map;
+      // console.log(map.file)
+      // fs.writeFileSync('./dist/es5-test.js', map?.sourcesContent[0]);
+      // fs.writeFileSync('./dist/es5-test.js.map', JSON.stringify({
+      //   version: map?.version,
+      //   sources: map?.sources,
+      //   names: map?.names,
+      //   sourceRoot: map?.sourceRoot,
+      //   mappings: map?.mappings,
+      //   file: map?.file
+      // }));
       fs.writeFileSync('./dist/es5-test.js', output?.code as string);
-      // fs.writeFileSync('.dist/es5-test.map', output.map);
       console.log('转换完成\n');
     });
   }
