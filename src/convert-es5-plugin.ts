@@ -1,7 +1,6 @@
 import fs from 'fs';
 import { Compiler } from 'webpack';
 import acorn from 'acorn';
-import { transformSync } from '@babel/core';
 
 interface IConvertES5Plugin {
   path: string;
@@ -31,7 +30,7 @@ class ConvertES5Plugin {
       }
 
       // 使用 babel 将语法转换成
-      const output = transformSync(code, {
+      const output = require('@babel/core').transformSync(code, {
         presets: [
           [
             'es2015',
