@@ -9,7 +9,11 @@ interface IConvertES5Plugin {
 class ConvertES5Plugin {
   constructor(private readonly options: IConvertES5Plugin = {path: 'dist/vendors~main.js'}) {}
 
-  apply(compiler: Compiler) {
+  /**
+   * 编译完成
+   * @param compiler 
+   */
+  private compilerDone(compiler: Compiler) {
     compiler.hooks.done.tap('ConvertES5Plugin', (compilation, callback) => {
       console.log('分析语法...');
       const filePath = this.options.path;
@@ -58,6 +62,10 @@ class ConvertES5Plugin {
       fs.writeFileSync('./dist/es5-test.js', output?.code as string);
       console.log('转换完成\n');
     });
+  }
+
+  apply(compiler: Compiler) {
+    // compiler.hooks.
   }
 }
 
