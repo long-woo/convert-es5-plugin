@@ -7,6 +7,7 @@ interface IConvertES5Plugin {
 }
 
 class ConvertES5Plugin {
+  private readonly pluginName = 'ConvertES5Plugin'
   constructor(private readonly options: IConvertES5Plugin = {path: 'dist/vendors~main.js'}) {}
 
   /**
@@ -14,7 +15,7 @@ class ConvertES5Plugin {
    * @param compiler 
    */
   private compilerDone(compiler: Compiler) {
-    compiler.hooks.done.tap('ConvertES5Plugin', (compilation, callback) => {
+    compiler.hooks.done.tap(this.pluginName, (compilation, callback) => {
       console.log('分析语法...');
       const filePath = this.options.path;
       let transformFile;
@@ -65,7 +66,27 @@ class ConvertES5Plugin {
   }
 
   apply(compiler: Compiler) {
-    // compiler.hooks.
+    const { devtool } = compiler.options;
+
+    compiler.hooks.compilation.tap(this.pluginName, compliation => {
+      if(devtool === 'source-map') {
+        compliation.hooks.buildModule.tap(this.pluginName, mod => {
+          mod.useSourceMap = true;
+        })
+      }
+
+      // https://github.com/webpack-contrib/terser-webpack-plugin/blob/master/src/index.js#L587
+      // compliation.hooks.optimizeChunks.tap(pluginName, chunks => {
+      //   chunks.map(chunk => {
+      //     // chunk.files.map(file => {
+      //     //   console.log(compliation.assets[file])
+      //     // })
+      //     chunk._modules.forEach(mod => {
+      //       console.log(mod)
+      //     })
+      //   })
+      // })
+    })
   }
 }
 
