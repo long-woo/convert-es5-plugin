@@ -32,7 +32,7 @@ const generateBanner = (name, fileName, version) => {
 };
 
 const buildFormat = fileName => ({
-  'cjs-dev': {
+  cjs: {
     outFile: `${fileName}.js`,
     format: 'cjs',
     mode: 'development'

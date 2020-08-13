@@ -68,14 +68,24 @@ class ConvertES5Plugin {
   apply(compiler: Compiler) {
     const { devtool } = compiler.options;
 
-    compiler.hooks.compilation.tap(this.pluginName, compliation => {
+    compiler.hooks.compilation.tap(this.pluginName, compilation => {
       if(devtool === 'source-map') {
-        compliation.hooks.buildModule.tap(this.pluginName, mod => {
+        compilation.hooks.buildModule.tap(this.pluginName, mod => {
           mod.useSourceMap = true;
         })
       }
 
       // https://github.com/webpack-contrib/terser-webpack-plugin/blob/master/src/index.js#L587
+      // 重新生成 contenthash
+      const { mainTemplate, chunkTemplate } = compilation;
+
+      mainTemplate.hooks.hashForChunk.tap(this.pluginName, (hash, chunk) => {
+        hash.update(this.pluginName)
+        hash.update(JSON.stringify({}))
+      })
+      // for(const template of [mainTemplate, chunkTemplate]) {
+      //   template.hooks.hashForChunk(this.pluginName)
+      // }
       // compliation.hooks.optimizeChunks.tap(pluginName, chunks => {
       //   chunks.map(chunk => {
       //     // chunk.files.map(file => {
