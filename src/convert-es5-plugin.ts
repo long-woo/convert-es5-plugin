@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { Compiler } from 'webpack';
 import acorn from 'acorn';
+import { version } from '../package.json';
 
 interface IConvertES5Plugin {
   path: string;
@@ -9,6 +10,10 @@ interface IConvertES5Plugin {
 class ConvertES5Plugin {
   private readonly pluginName = 'ConvertES5Plugin'
   constructor(private readonly options: IConvertES5Plugin = {path: 'dist/vendors~main.js'}) {}
+
+  private getAssets() {
+
+  }
 
   /**
    * 编译完成
@@ -76,26 +81,23 @@ class ConvertES5Plugin {
       }
 
       // https://github.com/webpack-contrib/terser-webpack-plugin/blob/master/src/index.js#L587
+      // http://kmanong.top/kmn/qxw/form/article?id=71180&cate=59
+      // https://www.webpackjs.com/contribute/writing-a-plugin/
+      // https://zoumiaojiang.com/article/what-is-real-webpack-plugin/#compilation-1
       // 重新生成 contenthash
       const { mainTemplate, chunkTemplate } = compilation;
 
       mainTemplate.hooks.hashForChunk.tap(this.pluginName, (hash, chunk) => {
-        hash.update(this.pluginName)
-        hash.update(JSON.stringify({}))
+        hash.update(this.pluginName);
+        hash.update(JSON.stringify({
+          convertES5: version
+        }));
       })
-      // for(const template of [mainTemplate, chunkTemplate]) {
-      //   template.hooks.hashForChunk(this.pluginName)
-      // }
-      // compliation.hooks.optimizeChunks.tap(pluginName, chunks => {
-      //   chunks.map(chunk => {
-      //     // chunk.files.map(file => {
-      //     //   console.log(compliation.assets[file])
-      //     // })
-      //     chunk._modules.forEach(mod => {
-      //       console.log(mod)
-      //     })
-      //   })
-      // })
+
+      compilation.hooks.optimizeChunkAssets.tap(this.pluginName, (chunk, callback) => {
+        console.log(chunk);
+        callback();
+      })
     })
   }
 }
