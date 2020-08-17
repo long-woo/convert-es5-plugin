@@ -10,7 +10,8 @@
     "build": "rollup -c"
   },
   "dependencies": {
-    "acorn": "^7.4.0"
+    "acorn": "^7.4.0",
+    "webpack-sources": "^1.4.3"
   },
   "devDependencies": {
     "@babel/core": "^7.11.0",

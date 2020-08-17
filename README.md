@@ -19,7 +19,7 @@ module.exports = {
   plugins: [
     ...
     // 使用
-    new ConvertES5Plugin({ path: 'dist' /* 默认文件夹是 `dist` */ })
+    new ConvertES5Plugin()
   ]
   ...
 };
