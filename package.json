@@ -3,12 +3,35 @@
   "displayName": "convert-es5-plugin",
   "version": "1.0.0",
   "description": "一个将 es6+ 语法转换成 es5 的 webpack 插件",
+  "author": {
+    "name": "long.woo",
+    "email": "longwunet@outlook.com",
+    "url": "https://longwo.me"
+  },
+  "keywords": [
+    "webpack",
+    "plugin",
+    "es6",
+    "es5",
+    "convert",
+    "transform",
+    "babel"
+  ],
+  "repository": {
+    "url": "https://github.com/long-woo/convert-es5-plugin"
+  },
+  "homepage": "https://github.com/long-woo/convert-es5-plugin/blob/master/README.md",
   "main": "./dist/convert-es5-plugin.min.js",
   "module": "./dist/convert-es5-plugin.es.min.js",
   "types": "./dist/types/convert-es5-plugin.d.ts",
   "scripts": {
     "build": "rollup -c"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "package.json"
+  ],
   "dependencies": {
     "acorn": "^7.4.0",
     "webpack-sources": "^1.4.3"
