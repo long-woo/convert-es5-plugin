@@ -25,7 +25,8 @@
   "module": "./dist/convert-es5-plugin.es.min.js",
   "types": "./dist/types/convert-es5-plugin.d.ts",
   "scripts": {
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "test": "echo 'test'"
   },
   "files": [
     "dist",
