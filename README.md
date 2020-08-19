@@ -1,5 +1,6 @@
 # convert-es5-plugin
 
+[![github action](https://github.com/long-woo/convert-es5-plugin/workflows/Node.js%20CI/badge.svg)](https://github.com/long-woo/convert-es5-plugin/actions?query=workflow%3A%22Node.js+CI%22)
 [![NPM VERSION](https://img.shields.io/npm/v/convert-es5-plugin.svg?style=flat)](https://npmjs.com/convert-es5-plugin)
 [![codecov](https://codecov.io/gh/long-woo/convert-es5-plugin/branch/master/graph/badge.svg)](https://codecov.io/gh/long-woo/convert-es5-plugin)
 
