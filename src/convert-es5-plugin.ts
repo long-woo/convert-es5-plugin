@@ -1,7 +1,6 @@
-import fs from 'fs';
 import acorn from 'acorn';
 import { Compiler, compilation as webpackCompilation } from 'webpack';
-import { RawSource } from 'webpack-sources'
+import { ConcatSource } from 'webpack-sources'
 import { version } from '../package.json';
 
 class ConvertES5Plugin {
@@ -18,10 +17,10 @@ class ConvertES5Plugin {
         if (!/\.(m?)js/i.test(file)) return;
 
         let transformFile;
-        const code = new RawSource(compilation.assets[file]).source();
+        const code = new ConcatSource(compilation.assets[file]).source();
+        // const ast = require('@babel/parser').parse(code, { sourceType: 'module' })
 
         // 检测语法是否为 es5
-        console.log('\n')
         console.log(`🔍 [${file}] 分析语法...`);
         try {
           acorn.parse(code, { ecmaVersion: 5 });
@@ -37,26 +36,36 @@ class ConvertES5Plugin {
 
         // 使用 babel 将语法转换成 es5
         const output = require('@babel/core').transformSync(code, {
-          // filename: file,
           presets: [
             [
               '@babel/preset-env',
               {
+                corejs: 3,
+                useBuiltIns: 'usage',
                 targets: '> 1%, last 2 versions, not ie <= 8'
               }
             ]
-          ]
+          ],
+          configFile: false
+          // plugins: [['@babel/plugin-transform-runtime', {
+          //   corejs: 3
+          // }]]
+          // compact: false,
+          // minified: false
         });
 
-        compilation.assets[file] = new RawSource(output.code);
+        compilation.assets[file] = new ConcatSource(output?.code as string);
         console.log(`✅ [${file}] 转换成功\n`);
       });
     });
   }
 
   apply(compiler: Compiler) {
-    // const { devtool } = compiler.options;
+    // const { entry } = compiler.options;
 
+    compiler.hooks.entryOption.tap(this.pluginName, (context, entry) => {
+      compiler.options.entry = ['core-js/stable', 'regenerator-runtime/runtime', entry]
+    });
     compiler.hooks.compilation.tap(this.pluginName, compilation => {
       // if(devtool === 'source-map' || devtool === 'cheap-source-map') {
       //   compilation.hooks.buildModule.tap(this.pluginName, mod => {

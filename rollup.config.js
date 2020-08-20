@@ -1,7 +1,6 @@
 import path from 'path';
 import resolve from '@rollup/plugin-node-resolve';
 import json from '@rollup/plugin-json';
-import buble from '@rollup/plugin-buble';
 import { terser } from 'rollup-plugin-terser';
 import typescript from 'rollup-plugin-typescript2';
 import progress from 'rollup-plugin-progress';
@@ -90,9 +89,6 @@ const getConfig = ({ outFile, format, mode }) => {
       }),
       resolve(),
       json(),
-      buble({
-        exclude: 'node_modules/**'
-      }),
       isProduction && terser(),
       progress()
     ],
