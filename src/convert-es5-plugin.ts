@@ -14,11 +14,10 @@ class ConvertES5Plugin {
   private optimizeJSChunkAssets(chunks: Array<webpackCompilation.Chunk>, compilation: webpackCompilation.Compilation) {
     chunks.map(chunk => {
       chunk.files.map(file => {
-        if (!/\.(m?)js/i.test(file)) return;
+        if (!/\.(m?)js$/i.test(file)) return;
 
         let transformFile;
         const code = new ConcatSource(compilation.assets[file]).source();
-        // const ast = require('@babel/parser').parse(code, { sourceType: 'module' })
 
         // 检测语法是否为 es5
         console.log(`🔍 [${file}] 分析语法...`);
@@ -47,9 +46,6 @@ class ConvertES5Plugin {
             ]
           ],
           configFile: false
-          // plugins: [['@babel/plugin-transform-runtime', {
-          //   corejs: 3
-          // }]]
           // compact: false,
           // minified: false
         });
@@ -61,32 +57,49 @@ class ConvertES5Plugin {
   }
 
   apply(compiler: Compiler) {
-    // const { entry } = compiler.options;
-
+    // 入口配置
     compiler.hooks.entryOption.tap(this.pluginName, (context, entry) => {
       compiler.options.entry = ['core-js/stable', 'regenerator-runtime/runtime', entry]
     });
+
+    compiler.hooks.normalModuleFactory.tap(this.pluginName, factory => {
+      // factory.hooks.parser.for('')
+      factory.hooks.parser.tap('javascript/auto', this.pluginName, (parser, options) => {
+        console.log(options);
+        // parser.hooks.program.tap(this.pluginName, (ast, comments) => {
+        //   console.log(comments)
+        // })
+      })
+    });
+
     compiler.hooks.compilation.tap(this.pluginName, compilation => {
-      // if(devtool === 'source-map' || devtool === 'cheap-source-map') {
-      //   compilation.hooks.buildModule.tap(this.pluginName, mod => {
-      //     mod.useSourceMap = true;
-      //   });
-      // }
+      // compilation.hooks.buildModule.tap(this.pluginName, mod => {
+      //     if (!/\/node_modules\//.test(mod?.context as string)) return
+
+      //     try {
+      //       const code = new ConcatSource(mod._source).source()
+      //       console.log(`🔍 [${mod.context}] 分析语法...`)
+      //       acorn.parse(code, { ecmaVersion: 5 });
+      //     } catch (err) {
+      //       console.log(`🚗 [${mod.context}] 存在 ES6+ 的语法，正在转换...`);
+      //     }
+      // });
 
       // 重新生成 contenthash
-      const { mainTemplate } = compilation;
-      mainTemplate.hooks.hashForChunk.tap(this.pluginName, (hash, chunk) => {
-        hash.update(this.pluginName);
-        hash.update(JSON.stringify({
-          convertES5: version
-        }));
-      });
+      // const { mainTemplate } = compilation;
+      // mainTemplate.hooks.hashForChunk.tap(this.pluginName, (hash, chunk) => {
+      //   hash.update(this.pluginName);
+      //   hash.update(JSON.stringify({
+      //     convertES5: version
+      //   }));
+      // });
 
-      // 处理输出资源
-      compilation.hooks.optimizeChunkAssets.tapAsync(this.pluginName, (chunks, callback) => {
-        this.optimizeJSChunkAssets(chunks, compilation);
-        callback();
-      });
+      // // 处理输出资源
+      // compilation.hooks.optimizeChunkAssets.tapAsync(this.pluginName, (chunks, callback) => {
+      //   // this.optimizeJSChunkAssets(chunks, compilation);
+      //   console.log('optimizeChunkAssets');
+      //   callback();
+      // });
     });
   }
 }
