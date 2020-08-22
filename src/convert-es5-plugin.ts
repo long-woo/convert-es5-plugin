@@ -1,10 +1,43 @@
 import acorn from 'acorn';
-import { Compiler, compilation as webpackCompilation } from 'webpack';
+import { Compiler, compilation as webpackCompilation, Stats, Module } from 'webpack';
 import { ConcatSource } from 'webpack-sources'
 import { version } from '../package.json';
 
 class ConvertES5Plugin {
   private readonly pluginName = 'ConvertES5Plugin'
+
+  /**
+   * 分析语法为 ES5
+   * @param code 代码
+   */
+  private isES5(code: string): boolean {
+    try {
+      acorn.parse(code, { ecmaVersion: 5 });
+    } catch (err) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private transform(code: string): void {
+    // 使用 babel 将语法转换成 es5
+    const output = require('@babel/core').transformSync(code, {
+      presets: [
+        [
+          '@babel/preset-env',
+          {
+            corejs: 3,
+            useBuiltIns: 'usage',
+            targets: '> 1%, last 2 versions, not ie <= 8'
+          }
+        ]
+      ],
+      configFile: false
+      // compact: false,
+      // minified: false
+    });
+  }
 
   /**
    * 优化 js 资源。分析 js 语法，将 es6+ 不兼容低版本浏览器的语法，通过 babel 转换成 es5
@@ -62,17 +95,39 @@ class ConvertES5Plugin {
       compiler.options.entry = ['core-js/stable', 'regenerator-runtime/runtime', entry]
     });
 
-    compiler.hooks.normalModuleFactory.tap(this.pluginName, factory => {
-      // factory.hooks.parser.for('')
-      factory.hooks.parser.tap('javascript/auto', this.pluginName, (parser, options) => {
-        console.log(options);
-        // parser.hooks.program.tap(this.pluginName, (ast, comments) => {
-        //   console.log(comments)
-        // })
-      })
+    // compiler.hooks.normalModuleFactory.tap(this.pluginName, factory => {
+    //   // factory.hooks.parser.for('')
+    //   factory.hooks.parser.tap('javascript/auto', this.pluginName, (parser, options) => {
+    //     console.log(options);
+    //     // parser.hooks.program.tap(this.pluginName, (ast, comments) => {
+    //     //   console.log(comments)
+    //     // })
+    //   })
+    // });
+    compiler.hooks.make.tapAsync(this.pluginName, (compilation, callback) => {
+      compilation.hooks.buildModule.tap(this.pluginName, mod => {
+        // @ts-ignore
+        const resource = mod.resource;
+        console.log(mod);
+        if (!/\/node_modules\//.test(resource) || !/\.(m?)js$/i.test(resource) || !mod._source) return;
+        console.log(123445556666);
+        const code = new ConcatSource(mod._source).source();
+        console.log(`🔍 [${resource}] 分析语法...`);
+        
+        if (this.isES5(code)) return;
+        console.log(`🚗 [${resource}] 存在 ES6+ 的语法，正在转换...`);
+
+        this.transform(code);
+      });
+
+      // compilation.hooks.succeedModule.tap(this.pluginName, module => {
+      //   console.timeEnd('TestPlugin');
+      // });
+      callback();
     });
 
     compiler.hooks.compilation.tap(this.pluginName, compilation => {
+      // console.log('compilation');
       // compilation.hooks.buildModule.tap(this.pluginName, mod => {
       //     if (!/\/node_modules\//.test(mod?.context as string)) return
 
