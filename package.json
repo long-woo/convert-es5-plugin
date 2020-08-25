@@ -21,7 +21,7 @@
     "url": "https://github.com/long-woo/convert-es5-plugin"
   },
   "homepage": "https://github.com/long-woo/convert-es5-plugin/blob/master/README.md",
-  "main": "./dist/convert-es5-plugin.min.js",
+  "main": "./dist/convert-es5-plugin.js",
   "module": "./dist/convert-es5-plugin.es.min.js",
   "types": "./dist/types/convert-es5-plugin.d.ts",
   "scripts": {
@@ -52,9 +52,7 @@
     "rollup-plugin-progress": "^1.1.2",
     "rollup-plugin-terser": "^6.1.0",
     "rollup-plugin-typescript2": "^0.27.1",
-    "typescript": "^3.9.7"
-  },
-  "peerDependencies": {
+    "typescript": "^3.9.7",
     "webpack": "^4.44.1"
   }
 }
