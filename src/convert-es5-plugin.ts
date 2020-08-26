@@ -144,27 +144,6 @@ class ConvertES5Plugin {
     });
 
     compiler.hooks.compilation.tap(this.pluginName, (compilation, { normalModuleFactory }) => {
-      // @ts-ignore
-      // compilation.dependencyTemplates.set(ConvertDependency, new ConvertDependency.Template());
-  
-      // compilation.hooks.buildModule.tap(this.pluginName, mod => {
-      //     // @ts-ignore
-      //     const resource = mod.resource;
-      //     if (!/\/node_modules\//.test(resource) || !/\.(m?)js$/i.test(resource)) return;
-
-      //     const code = fs.readFileSync(resource, 'utf-8')
-      //     // const code = new ConcatSource(mod._source).source();
-      //     console.log(`🔍 [${resource}] 分析语法...`);
-          
-      //     if (this.isES5(code)) return;
-      //     console.log(`🚗 [${resource}] 存在 ES6+ 的语法，正在转换...`);
-      //     const newCode = this.transform(code);
-
-      //     mod._source = new ConcatSource(newCode).source();
-      //     // @ts-ignore
-      //     mod.addDependency(new ConvertDependency(mod));
-      // });
-
       // 重新生成 contenthash
       // const { mainTemplate } = compilation;
       // mainTemplate.hooks.hashForChunk.tap(this.pluginName, (hash, chunk) => {
