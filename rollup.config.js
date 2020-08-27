@@ -73,7 +73,7 @@ const getConfig = ({ outFile, format, mode }) => {
   }, {});
 
   return {
-    input: pathResolve(`src/convert-es5-plugin.ts`),
+    input: pathResolve(`src/index.ts`),
     output: {
       file: pathResolve(`dist/${outFile}`),
       banner: generateBanner(pkg.name, outFile, version),

@@ -96,29 +96,38 @@ class ConvertES5Plugin {
 
   apply(compiler: Compiler) {
     // 入口配置
-    compiler.hooks.entryOption.tap(this.pluginName, (context, entry) => {
-      compiler.options.entry = ['core-js/stable', 'regenerator-runtime/runtime', entry]
-    });
+    // compiler.hooks.entryOption.tap(this.pluginName, (context, entry) => {
+    //   compiler.options.entry = ['core-js/stable', 'regenerator-runtime/runtime', entry]
+    // });
 
-    compiler.hooks.make.tapAsync(this.pluginName, (compilation, callback) => {
+    compiler.hooks.thisCompilation.tap(this.pluginName, compilation => {
+      console.log('thisCompilation');
+      // compilation.hooks.normalModuleLoader.tap(this.pluginName, (loaderContext, mod) => {
+      //   // if(!/node_modules\/node-rsa/.test(loaderContext)) return
+      //   console.log(mod);
+      //   throw new Error('')
+      // });
       // @ts-ignore
-      compilation.dependencyTemplates.set(ConvertDependency, new ConvertDependency.Template());
+      // compilation.dependencyTemplates.set(ConvertDependency, new ConvertDependency.Template());
       compilation.hooks.buildModule.tap(this.pluginName, mod => {
-          // @ts-ignore
-          const resource = mod.resource;
-          if (!/\/node_modules\//.test(resource) || !/\.(m?)js$/i.test(resource)) return;
-
-          const code = fs.readFileSync(resource, 'utf-8')
-          // const code = new ConcatSource(mod._source).source();
-          console.log(`🔍 [${resource}] 分析语法...`);
-          
-          if (this.isES5(code)) return;
-          console.log(`🚗 [${resource}] 存在 ES6+ 的语法，正在转换...`);
-          const newCode = this.transform(code);
-
-          mod._source = new ConcatSource(newCode).source();
-          // @ts-ignore
-          mod.addDependency(new ConvertDependency(mod));
+        console.log('buildModule')
+        // @ts-ignore
+        const resource = mod.resource;
+        console.log(mod);
+        if (!/\/node_modules\//.test(resource) || !/\.(m?)js$/i.test(resource)) return;
+        console.log(resource);
+        console.log(mod);
+        // const code = fs.readFileSync(resource, 'utf-8')
+        // // const code = new ConcatSource(mod._source).source();
+        // console.log(`🔍 [${resource}] 分析语法...`);
+        
+        // if (this.isES5(code)) return;
+        // console.log(`🚗 [${resource}] 存在 ES6+ 的语法，正在转换...`);
+        // const newCode = this.transform(code);
+        // console.log(newCode);
+        // mod._source = new ConcatSource(newCode).source();
+        // // @ts-ignore
+        // mod.addDependency(new ConvertDependency(mod));
       });
 
       // compilation.hooks.seal.tap(this.pluginName, (a) => {
@@ -136,14 +145,16 @@ class ConvertES5Plugin {
 
       //     mod._source = new ConcatSource(newCode).source();
       //     // @ts-ignore
-      //     mod.parser.parse(mod._source, {module: mod})
+      //     // mod.parser.parse(mod._source, {module: mod})
       //     // throw new Error('')
+      //     // @ts-ignore
+      //     mod.addDependency(new ConvertDependency(mod));
       //   })
       // })
-      callback();
     });
 
     compiler.hooks.compilation.tap(this.pluginName, (compilation, { normalModuleFactory }) => {
+      // console.log('compilation');
       // 重新生成 contenthash
       // const { mainTemplate } = compilation;
       // mainTemplate.hooks.hashForChunk.tap(this.pluginName, (hash, chunk) => {
@@ -154,9 +165,10 @@ class ConvertES5Plugin {
       // });
 
       // 处理输出资源
-      // compilation.hooks.optimizeChunkAssets.tap(this.pluginName, (chunks) => {
+      // compilation.hooks.optimizeChunkAssets.tapAsync(this.pluginName, (chunks, callback) => {
+      //   console.log('optimizeChunkAssets')
       //   // this.optimizeJSChunkAssets(chunks, compilation);
-      //   // callback();
+      //   callback();
       // });
 
       // const hander = (parser: webpackCompilation.normalModuleFactory.Parser) => {
@@ -168,4 +180,4 @@ class ConvertES5Plugin {
   }
 }
 
-module.exports = ConvertES5Plugin;
+export { ConvertES5Plugin };

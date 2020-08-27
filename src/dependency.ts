@@ -1,13 +1,11 @@
 import webpack, { compilation as webpackCompilation } from 'webpack';
-import { ReplaceSource } from 'webpack-sources';
-// @ts-ignore
-// const Dependency = require('webpack/lib/Dependency');
+import { ReplaceSource, ConcatSource } from 'webpack-sources';
 
 class ConvertDependencyTemplate {
   apply(dependency: ConvertDependency, source: ReplaceSource) {
-    console.log(dependency.module._source)
-    throw new Error('')
-    // source.replace(0, 0, dependency._source)
+    const newSource = new ConcatSource(dependency.module._source).source()
+
+    source.replace(0, 0, newSource)
   }
 }
 
