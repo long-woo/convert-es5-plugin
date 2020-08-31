@@ -4,8 +4,9 @@ import { ReplaceSource, ConcatSource } from 'webpack-sources';
 class ConvertDependencyTemplate {
   apply(dependency: ConvertDependency, source: ReplaceSource) {
     const newSource = new ConcatSource(dependency.module._source).source()
-
-    source.replace(0, 0, newSource)
+    // console.log(newSource);
+    // throw new Error('123');
+    // source.replace(0, 0, newSource)
   }
 }
 

@@ -100,61 +100,40 @@ class ConvertES5Plugin {
     //   compiler.options.entry = ['core-js/stable', 'regenerator-runtime/runtime', entry]
     // });
 
-    compiler.hooks.thisCompilation.tap(this.pluginName, compilation => {
-      console.log('thisCompilation');
-      // compilation.hooks.normalModuleLoader.tap(this.pluginName, (loaderContext, mod) => {
-      //   // if(!/node_modules\/node-rsa/.test(loaderContext)) return
-      //   console.log(mod);
-      //   throw new Error('')
-      // });
-      // @ts-ignore
-      // compilation.dependencyTemplates.set(ConvertDependency, new ConvertDependency.Template());
-      compilation.hooks.buildModule.tap(this.pluginName, mod => {
-        console.log('buildModule')
-        // @ts-ignore
-        const resource = mod.resource;
-        console.log(mod);
-        if (!/\/node_modules\//.test(resource) || !/\.(m?)js$/i.test(resource)) return;
-        console.log(resource);
-        console.log(mod);
-        // const code = fs.readFileSync(resource, 'utf-8')
-        // // const code = new ConcatSource(mod._source).source();
-        // console.log(`🔍 [${resource}] 分析语法...`);
+    // compiler.hooks.thisCompilation.tap(this.pluginName, compilation => {
+    //   // @ts-ignore
+    //   // compilation.dependencyTemplates.set(ConvertDependency, new ConvertDependency.Template());
+
+    //   compilation.fileDependencies
+    //   compilation.hooks.buildModule.tap(this.pluginName, mod => {
+    //     // @ts-ignore
+    //     const { resource, loaders = [] } = mod;
+    //     // if (!/\/node_modules\/.*\.(m?)js$/.test(resource) && loaders.length) return;
+    //     if (!/\/node_modules\/node-rsa\/.*\.(m?)js$/.test(resource)) return;
+
+    //     // @ts-ignore
+    //     const code = fs.readFileSync(resource, 'utf-8')
+    //     // const code = new ConcatSource(mod._source).source();
+    //     console.log(`🔍 [${resource}] 分析语法...`);
         
-        // if (this.isES5(code)) return;
-        // console.log(`🚗 [${resource}] 存在 ES6+ 的语法，正在转换...`);
-        // const newCode = this.transform(code);
-        // console.log(newCode);
-        // mod._source = new ConcatSource(newCode).source();
-        // // @ts-ignore
-        // mod.addDependency(new ConvertDependency(mod));
-      });
-
-      // compilation.hooks.seal.tap(this.pluginName, (a) => {
-      //   compilation.modules.map(mod => {
-      //     // @ts-ignore
-      //     const resource = mod.resource;
-      //     if (!/\/node_modules\//.test(resource) || !/\.(m?)js$/i.test(resource)) return;
-
-      //     const code = new ConcatSource(mod._source).source();
-      //     console.log(`🔍 [${resource}] 分析语法...`);
-          
-      //     if (this.isES5(code)) return;
-      //     console.log(`🚗 [${resource}] 存在 ES6+ 的语法，正在转换...`);
-      //     const newCode = this.transform(code);
-
-      //     mod._source = new ConcatSource(newCode).source();
-      //     // @ts-ignore
-      //     // mod.parser.parse(mod._source, {module: mod})
-      //     // throw new Error('')
-      //     // @ts-ignore
-      //     mod.addDependency(new ConvertDependency(mod));
-      //   })
-      // })
-    });
+    //     if (this.isES5(code)) {
+    //       console.log(mod._source);
+    //       return;
+    //     }
+    //     console.log(`🚗 [${resource}] 存在 ES6+ 的语法，正在转换...`);
+    //     const newCode = this.transform(code);
+    //     mod._source = new ConcatSource(newCode);
+    //     console.log(mod._source)
+    //     // @ts-ignore
+    //     // mod.addDependency(new ConvertDependency(mod));
+    //   });
+    // });
 
     compiler.hooks.compilation.tap(this.pluginName, (compilation, { normalModuleFactory }) => {
-      // console.log('compilation');
+      compilation.hooks.finishModules.tapAsync(this.pluginName, (mods, callback) => {
+        
+        callback();
+      })
       // 重新生成 contenthash
       // const { mainTemplate } = compilation;
       // mainTemplate.hooks.hashForChunk.tap(this.pluginName, (hash, chunk) => {
